@@ -1,6 +1,7 @@
 package gomine
 
 import (
+	"errors"
 	"log"
 
 	"github.com/andybalholm/cascadia"
@@ -39,7 +40,7 @@ func Find(root *html.Node, element string) *html.Node {
 			}
 		})
 
-	return found.FirstChild
+	return found
 }
 
 // FindAll finds and return the first Node that contains element
@@ -55,9 +56,29 @@ func FindAll(root *html.Node, element string) []*html.Node {
 	traverse(root,
 		func(current *html.Node) {
 			if match(current) {
-				found = append(found, current.FirstChild)
+				found = append(found, current)
 			}
 		})
 
 	return found
+}
+
+// Partition returns first element found in a query
+func Partition(root *html.Node, query string) (*html.Node, error) {
+	result := Find(root, query)
+
+	// element not found
+	if result == nil {
+		return nil, errors.New("element not found")
+	}
+
+	// parent == nil means partitioning root
+	if result.Parent == nil {
+		return root, nil
+	}
+
+	// remove from root tree
+	result.Parent.RemoveChild(result)
+
+	return result, nil
 }

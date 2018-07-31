@@ -61,14 +61,14 @@ func TestAll(t *testing.T) {
 			result := Find(root, selector)
 
 			// Compare computed result to expected result
-			if result.Data != test.result[i] {
-				t.Errorf("Incorrect Value, got: %s, want: %s\n", result.Data, test.result[i])
+			if result.FirstChild.Data != test.result[i] {
+				t.Errorf("Incorrect Value, got: %s, want: %s\n", result.FirstChild.Data, test.result[i])
 			}
 
 			// FindAll Test
 			concatString := ""
 			for _, resultAll := range FindAll(root, selector) {
-				concatString += resultAll.Data
+				concatString += resultAll.FirstChild.Data
 			}
 
 			// Compare computed result to expected result
