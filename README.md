@@ -1,4 +1,5 @@
-![GoMine](https://github.com/ThomasChuDesigns/go-mine/gomine128.png)# GoMine
+![alt text](/gomine48.png "GoMine")
+# GoMine
 
 A web scraping library written in Golang.
 
