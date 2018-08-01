@@ -8,13 +8,17 @@ import (
 	"golang.org/x/net/html"
 )
 
-func traverse(current *html.Node, action func(current *html.Node)) {
+func traverse(current *html.Node, action func(current *html.Node) bool) {
 
 	if current.FirstChild == nil {
 		return
 	}
 
-	action(current)
+	isFound := action(current)
+	// if action returns true, stop traversing
+	if isFound {
+		return
+	}
 
 	for c := current.FirstChild; c != nil; c = c.NextSibling {
 		traverse(c, action)
@@ -34,10 +38,11 @@ func Find(root *html.Node, element string) *html.Node {
 
 	// traverse root and assign correct node to found if empty
 	traverse(root,
-		func(current *html.Node) {
+		func(current *html.Node) bool {
 			if match(current) && found == nil {
 				found = current
 			}
+			return false
 		})
 
 	return found
@@ -54,10 +59,12 @@ func FindAll(root *html.Node, element string) []*html.Node {
 
 	// traverse root and assign correct node to found if empty
 	traverse(root,
-		func(current *html.Node) {
+		func(current *html.Node) bool {
 			if match(current) {
 				found = append(found, current)
+				return true
 			}
+			return false
 		})
 
 	return found
