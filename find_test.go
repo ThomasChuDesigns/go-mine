@@ -44,7 +44,7 @@ var tests = []htmlTest{{
 }}
 
 // TestAll function tests Find and FindAll function from gomine library
-func TestAll(t *testing.T) {
+func TestFind(t *testing.T) {
 	for _, test := range tests {
 
 		// Parse test document to a html.Node tree

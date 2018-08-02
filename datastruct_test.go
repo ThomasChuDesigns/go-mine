@@ -71,4 +71,8 @@ func TestStackPop(t *testing.T) {
 	go s.Pop(&wg)
 	go s.Pop(&wg)
 	wg.Wait()
+
+	if !s.IsEmpty() {
+		t.Error("stack supposed to be empty")
+	}
 }

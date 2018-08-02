@@ -5,6 +5,9 @@ import (
 	"sync"
 )
 
+// Stack object allows goroutines for
+// pushing/popping data while
+// handling race conditions
 type Stack struct {
 	array   []interface{}
 	current int
@@ -78,4 +81,12 @@ func NewStack(a ...interface{}) *Stack {
 		stackCurrent = len(a) - 1
 	}
 	return &Stack{array: stackArray, current: stackCurrent, size: stackSize}
+}
+
+// IsEmpty checks if stack is empty
+func (s *Stack) IsEmpty() bool {
+	if s.current == -1 {
+		return true
+	}
+	return false
 }
