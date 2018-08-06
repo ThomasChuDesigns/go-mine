@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/ThomasChuDesigns/gomine"
 	"golang.org/x/net/html"
 )
 
@@ -15,12 +16,12 @@ type workerTest struct {
 func findTask(r *html.Node) map[string]interface{} {
 	findAllRes := ""
 
-	for _, item := range FindAll(r, "div>a") {
+	for _, item := range gomine.FindAll(r, "div>a") {
 		findAllRes += item.FirstChild.Data
 	}
 
 	val := map[string]interface{}{
-		"find":    Find(r, "div>a").FirstChild.Data,
+		"find":    gomine.Find(r, "div>a").FirstChild.Data,
 		"findAll": findAllRes,
 	}
 	return val
@@ -28,10 +29,10 @@ func findTask(r *html.Node) map[string]interface{} {
 
 var workerTests = []workerTest{
 	{
-		"./tests/1.html",
+		"./1.html",
 		[]string{"1", "12345"}},
 	{
-		"./tests/2.html",
+		"./2.html",
 		[]string{"1", "123"}},
 }
 
@@ -40,8 +41,8 @@ func TestWorker(t *testing.T) {
 		f, _ := os.Open(w.filename)
 		r, _ := html.Parse(f)
 
-		wr := Worker{r, findTask}
-		got := wr.task(wr.pageRoot)
+		wr := gomine.Worker{r, findTask}
+		got := wr.Task(wr.PageRoot)
 
 		// find test
 		if w.result[0] != got["find"] {

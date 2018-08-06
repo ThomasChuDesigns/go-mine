@@ -9,14 +9,14 @@ import (
 
 // Worker scrapes a url by given task
 type Worker struct {
-	pageRoot *html.Node
-	task     func(root *html.Node) map[string]interface{}
+	PageRoot *html.Node
+	Task     func(root *html.Node) map[string]interface{}
 }
 
 // Execute the task with given url
 func (w *Worker) Execute(wg *sync.WaitGroup) interface{} {
 	defer wg.Done()
-	return w.task(w.pageRoot)
+	return w.Task(w.PageRoot)
 }
 
 // GetRootByURL returns a root node of html page if url is valid

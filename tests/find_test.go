@@ -5,6 +5,7 @@ import (
 	"log"
 	"testing"
 
+	"github.com/ThomasChuDesigns/gomine"
 	"golang.org/x/net/html"
 )
 
@@ -58,7 +59,7 @@ func TestFind(t *testing.T) {
 		for i, selector := range test.query {
 
 			// Find Test
-			result := Find(root, selector)
+			result := gomine.Find(root, selector)
 
 			// Compare computed result to expected result
 			if result.FirstChild.Data != test.result[i] {
@@ -67,7 +68,7 @@ func TestFind(t *testing.T) {
 
 			// FindAll Test
 			concatString := ""
-			for _, resultAll := range FindAll(root, selector) {
+			for _, resultAll := range gomine.FindAll(root, selector) {
 				concatString += resultAll.FirstChild.Data
 			}
 
