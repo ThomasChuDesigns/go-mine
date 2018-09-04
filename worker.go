@@ -20,17 +20,17 @@ func (w *Worker) Execute(wg *sync.WaitGroup) interface{} {
 }
 
 // GetRootByURL returns a root node of html page if url is valid
-func GetRootByURL(url string) *html.Node {
+func GetRootByURL(url string) (*html.Node, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	root, err := html.Parse(resp.Body)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	return root
+	return root, nil
 
 }

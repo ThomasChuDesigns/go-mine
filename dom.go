@@ -10,6 +10,7 @@ import (
 
 func traverse(current *html.Node, action func(current *html.Node) bool) {
 
+	// root is nil exit traversal
 	if current.FirstChild == nil {
 		return
 	}
@@ -20,6 +21,7 @@ func traverse(current *html.Node, action func(current *html.Node) bool) {
 		return
 	}
 
+	// breadth first search all nodes
 	for c := current.FirstChild; c != nil; c = c.NextSibling {
 		traverse(c, action)
 	}

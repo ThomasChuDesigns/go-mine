@@ -1,7 +1,6 @@
 package gomine
 
 import (
-	"math"
 	"sync"
 )
 
@@ -9,19 +8,16 @@ import (
 // pushing/popping data while
 // handling race conditions
 type Stack struct {
-	Array   []interface{}
-	Current int
+	Current *StackNode
 	Size    int
 	sync.Mutex
 }
 
-func (s *Stack) resize(newSize int) {
-	// copy current array to new array with newSize
-	newArray := make([]interface{}, newSize)
-	copy(newArray, s.Array)
-
-	s.Array = newArray
-	s.Size = newSize
+// StackNode is a linked list that handles the stacks dynamic allocation/deallocation
+type StackNode struct {
+	Val  interface{}
+	Next *StackNode
+	Prev *StackNode
 }
 
 // Push appends a value into the stack
@@ -30,14 +26,19 @@ func (s *Stack) Push(value interface{}) {
 	s.Lock()
 	defer s.Unlock()
 
-	s.Current++
-	s.Array[s.Current] = value
+	newNode := &StackNode{value, nil, s.Current}
 
-	// if current index + 1 == n then expand array by 2n
-	if s.Current+1 == s.Size {
-		s.resize(2 * s.Size)
+	// stack is empty so this node is at the top
+	if s.Current == nil {
+		s.Current = newNode
 	}
 
+	// link current node to new node
+	s.Current.Next = newNode
+	s.Current = newNode
+
+	// update size of stack
+	s.Size++
 }
 
 // Pop takes the most recent value out of the stack
@@ -46,23 +47,17 @@ func (s *Stack) Pop() interface{} {
 	s.Lock()
 	defer s.Unlock()
 
-	if s.Current == -1 {
+	// nothing to pop
+	if s.Current == nil {
 		return nil
 	}
 
-	// replace peek value with nil
-	var value = s.Array[s.Current]
-	s.Array[s.Current] = nil
+	// take node from the top of stack and set current to previous node
+	popVal := s.Current.Val
+	s.Current = s.Current.Prev
 
-	//if current == n/4 then reduce array to n/2
-	resizeValue := int(math.Ceil(float64(s.Size) / 4.0))
-	if s.Current == resizeValue {
-		newSize := int(math.Ceil(float64(s.Size) / 2.0))
-		s.resize(newSize)
-	}
-
-	s.Current--
-	return value
+	s.Size--
+	return popVal
 }
 
 // AsyncPush appends a value into the stack
@@ -82,18 +77,17 @@ func (s *Stack) AsyncPop(wg *sync.WaitGroup) interface{} {
 
 // NewStack initializes a new stack
 func NewStack(a ...interface{}) *Stack {
-	// default values for stack
-	stackArray := make([]interface{}, 4)
-	stackSize := 4
-	stackCurrent := -1
+	newStack := &Stack{Current: nil, Size: 0}
 
 	// if params available use given values for stack
 	if a != nil {
-		stackArray = a
-		stackSize = len(a)
-		stackCurrent = len(a) - 1
+		// iterate through by pushing items to stack
+		for _, val := range a {
+			newStack.Push(val)
+		}
 	}
-	return &Stack{Array: stackArray, Current: stackCurrent, Size: stackSize}
+
+	return newStack
 }
 
 // IsEmpty checks if stack is empty
@@ -101,8 +95,5 @@ func (s *Stack) IsEmpty() bool {
 	s.Lock()
 	defer s.Unlock()
 
-	if s.Current == -1 {
-		return true
-	}
-	return false
+	return s.Size == 0
 }
